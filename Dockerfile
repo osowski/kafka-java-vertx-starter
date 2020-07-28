@@ -1,5 +1,6 @@
 ### Stage 1 - Java Build
-FROM maven:3.6.3-openjdk-11
+#FROM maven:3.6.3-openjdk-11
+FROM maven:3.6.3-openjdk-8 as builder
 
 VOLUME /volume/gitrepo
 
@@ -11,8 +12,9 @@ COPY pom.xml /local/gitrepo/pom.xml
 RUN mvn clean package
 
 ### Stage 2 - Docker Build
-FROM openjdk:11-slim
-COPY --from=0 /local/gitrepo/target/demo-all.jar /usr/app/demo-all.jar
-COPY --from=0 /local/gitrepo/kafka.properties /usr/app/kafka.properties
+FROM openjdk:8-jre-alpine as runner
+COPY --from=builder /local/gitrepo/target/demo-all.jar /usr/app/demo-all.jar
+COPY --from=builder /local/gitrepo/kafka.properties /usr/app/config/kafka.properties
 WORKDIR /usr/app
-CMD ["java","-Dproperties_path=/usr/app/kafka.properties","-jar","demo-all.jar"]
+EXPOSE 8080
+CMD ["java","-Dproperties_path=/usr/app/config/kafka.properties","-jar","demo-all.jar"]
