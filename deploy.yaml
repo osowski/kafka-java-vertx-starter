@@ -1,0 +1,29 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: kafka-java-vertx-starter
+  labels:
+    app: kafka-java-vertx-starter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-java-vertx-starter
+  template:
+    metadata:
+      labels:
+        app: kafka-java-vertx-starter
+    spec:
+      containers:
+        - name: kafka-java-vertx-starter
+          image: osowski/kafka-java-vertx-starter
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 1
+  progressDeadlineSeconds: 600
